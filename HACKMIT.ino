@@ -153,8 +153,8 @@ void displayIdea()
     display.setCursor(0, 0);
     display.println("Your idea is:");
     display.println(displayString);
-    display.setCursor(0, 50);
-    display.println("Press to continue");
+    display.setCursor(0, 46);
+    display.println("Check it out on your dashboard!");
     display.display();
     delay(500);
     while (true)
@@ -279,7 +279,7 @@ void setup()
     display.setTextSize(1);
     display.setTextColor(WHITE);
     display.setCursor(0, 28);
-    display.print("Connecting to wifi....");
+    display.print("Connecting to WiFi...");
     display.display();
 
     WiFi.begin(ssid, password); // Connect to your WiFi router
