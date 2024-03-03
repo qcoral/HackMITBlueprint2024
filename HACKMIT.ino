@@ -9,6 +9,7 @@
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 #define GPT_DELAY 10000; // 10 seconds, just to be safe
+#define TONE_TIMING 50 // timing between beeps
 
 // Declaration for SSD1306 display connected using I2C
 #define OLED_RESET -1 // Reset pin
@@ -20,20 +21,18 @@ WiFiServer server(80);
 // Add/Subtract people
 int addPerson = D8;
 int subPerson = D4;
-int numPeople = 0;
+int numPeople = 1;
 
 // Add/Subtract hours
 int addHour = D5;
 int subHour = D6;
-int numHours = 0;
+int numHours = 1;
 
 String displayString = "";
 
 // Generate buttons & animation pins
 int genButton = D7;
-// int RLED = 10
-// int GLED = 9
-// int BLED = 8
+int speaker = D3;
 
 // Wi-Fi configuration
 const char *ssid = "SM-A526W8121";
@@ -41,8 +40,21 @@ const char *password = "dtwg0081";
 
 void animation()
 {
-    // digitalWrite(RLED, HIGH);
-    // delay(200);
+    tone(speaker, 800);
+    delay(TONE_TIMING);
+    noTone(speaker);
+    delay(TONE_TIMING);
+    tone(speaker, 800);
+    delay(TONE_TIMING);
+    noTone(speaker);
+    delay(TONE_TIMING);
+    tone(speaker, 800);
+    delay(TONE_TIMING);
+    noTone(speaker);
+    delay(TONE_TIMING);
+    tone(speaker, 800);
+    delay(TONE_TIMING);
+    noTone(speaker);
 }
 
 String prepareJson()
@@ -165,7 +177,7 @@ void displayStats()
     display.clearDisplay();
     display.setTextColor(WHITE);
     display.setTextSize(2);
-    display.setCursor(0,0);
+    display.setCursor(0, 0);
     display.println("IDEABOARD v1.0");
     display.setTextSize(1);
 
@@ -258,6 +270,18 @@ void setup()
             ; // Don't proceed, loop forever
     }
 
+    //Clear display
+    display.display();
+    delay(500);
+    display.clearDisplay();
+    display.display();
+    delay(500);
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 28);
+    display.print("Connecting to wifi....");
+    display.display();
+
     WiFi.begin(ssid, password); // Connect to your WiFi router
     Serial.println("Connecting to WiFi");
     // Wait for connection
@@ -276,11 +300,6 @@ void setup()
     pinMode(subHour, INPUT);
     pinMode(genButton, INPUT);
     pinMode(LED_BUILTIN, OUTPUT);
-
-    //animation LEDs
-    // pinMode(RLED, OUTPUT);
-    // pinMode(GLED, OUTPUT);
-    // pinMode(BLED, OUTPUT);
 }
 
 void loop()
@@ -290,7 +309,7 @@ void loop()
         numPeople++;
         delay(300);
     }
-    else if (digitalRead(subPerson) == HIGH && numPeople > 0)
+    else if (digitalRead(subPerson) == HIGH && numPeople > 1)
     {
         numPeople--;
         delay(300);
@@ -300,7 +319,7 @@ void loop()
         numHours++;
         delay(300);
     }
-    else if (digitalRead(subHour) == HIGH && numHours > 0)
+    else if (digitalRead(subHour) == HIGH && numHours > 1)
     {
         numHours--;
         delay(300);
@@ -310,7 +329,6 @@ void loop()
         Serial.println("genbutton was pressed");
         digitalWrite(LED_BUILTIN, HIGH);
         animation();
-        delay(300);
         while (displayString == "")
         {
             sendingMsg();
@@ -322,8 +340,8 @@ void loop()
             }
         }
         displayString = "";
-        numHours = 0;
-        numPeople = 0;
+        numHours = 1;
+        numPeople = 1;
     }
     else
     {
